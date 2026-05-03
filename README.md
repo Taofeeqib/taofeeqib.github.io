@@ -3,7 +3,7 @@
 **Target codebase:** `github.com/Taofeeqib/security-training-platform` (intentionally vulnerable .NET 8 / Angular Juice-Shop–style training platform)  
 **Target URL:** [http://vms-poc-app.hellosec.io/](http://vms-poc-app.hellosec.io/)  
 **Prepared:** 2026-05-01  
-**Purpose:** Benchmark detection accuracy, false-positive rate, true-positive rate, and false-negative rate across four security tools for internal research and team presentation.
+**Purpose:** Benchmark detection accuracy, false-positive rate, true-positive rate, and false-negative rate across four security tools for research purposes.
 
 ---
 
@@ -64,7 +64,7 @@ The four tools were selected to cover the main categories used in modern applica
 
 Each tool scanned the same repository and commit within a 48-hour window. To measure them on equal footing, a **62-item ground-truth corpus** was constructed by taking the union of all four reports, verifying every candidate against the source code, and cross-checking against the In-House Agent's runtime-validated findings (see [§4](#4-ground-truth-construction) and [Appendix A](#appendix-a--62-item-ground-truth-corpus)). Detection rate (recall), false-positive rate, precision, and evidence quality are then computed against that corpus.
 
-The goal is not to declare a single winner but to characterise what each tool does well, where each one blind-spots, and which combinations produce the best coverage-per-euro for a training-platform-scale application.
+The goal is not to declare a single winner but to characterise what each tool does well, where each one blind-spots, and which combinations produce the best coverage-per-euro for applications.
 
 ---
 
@@ -79,7 +79,7 @@ The goal is not to declare a single winner but to characterise what each tool do
 | D   | **In-House Agent** (run `05638cadf43f`) | `Inhouse_run_05638cadf43f.json`                          | Multi-source **SAST + SCA + DAST validator** | Wiz portal + Semgrep + LLM scanner + runtime validator + LLM triage + reconciliation | **277 considered → 230 deduped → 131 TP + 95 FP + 4 NV** |
 
 
-> All four tools scanned the same repository and commit within a 48-hour window. The In-House Agent's `05638cadf43f` run is a full multi-source pipeline (Wiz + Semgrep + LLM scanner), **not** the LLM-only run used previously.
+> All four tools scanned the same repository and commit within a 48-hour window. The In-House Agent's `05638cadf43f` run is a full multi-source pipeline (Wiz + Semgrep + LLM scanner).
 
 ---
 
@@ -104,7 +104,7 @@ Because no single report is authoritative, we built a consolidated ground-truth 
 
 **Consolidated ground-truth: 62 distinct real vulnerabilities.** Each is validated either (a) by the In-House Agent's runtime validator probe, (b) by the AWS Agent's proof-of-exploit, or (c) by at least two independent static tools.
 
-The 62-item list covers SQLi login, product-search SQLi, mass-assignment role, MD5 hashing, JWT secret, XXE, SSRF variants, Zip Slip, path traversals, the OAuth attack-chain family, MFA logic, basket IDORs, XSS family, business logic, NoSQL, YAML bomb, metrics/logs/Swagger exposure, dependency CVEs, and more. See [Appendix A](#appendix-a--62-item-ground-truth-corpus) for the full enumeration.
+The 62-item list covers SQLi login, product-search SQLi, mass-assignment role, MD5 hashing, JWT secret, XXE, SSRF variants, Zip Slip, path traversals, the OAuth attack-chain family, MFA logic, basket IDORs, XSS family, business logic, NoSQL, YAML bomb, metrics/logs/Swagger exposure, dependency CVEs, and more. See 5 below or [Appendix A](#appendix-a--62-item-ground-truth-corpus) for the full enumeration.
 
 ---
 
@@ -312,7 +312,7 @@ Example Set A items: `bypassSecurityTrustHtml` with JWT data (LLM + Semgrep + Wi
 - **Best overall recall (69 %) — narrowly beats Claude Security.**
 - **Only tool that fuses SAST (Wiz + Semgrep) + AI review (LLM scanner) + runtime DAST validator + LLM triage + multi-source reconciliation in a single run.**
 - Built-in **triage layer** labels each finding `true_positive` / `false_positive` / `needs_validation`, with a per-finding rationale — no other tool does this.
-- Built-in **runtime validator** executed 72 probes that turned static findings into **`confirmed_exploitable`** evidence (e.g. "Submitted XSS payload `<script>alert('XSS')</script>` via `POST /api/Feedbacks`, which returned 201 and stored the payload verbatim…").
+- Built-in **runtime validator** executed 72 probes that turned static findings into `**confirmed_exploitable`** evidence (e.g. "Submitted XSS payload `<script>alert('XSS')</script>` via `POST /api/Feedbacks`, which returned 201 and stored the payload verbatim…").
 - **Multi-source reconciliation** (Set A): 19 findings confirmed by ≥2 independent engines — the highest-confidence tier, which none of the others produce.
 - Strongest coverage on Angular / client-side patterns (`bypassSecurityTrustHtml`, localStorage token storage, cookie flags, DOM XSS).
 - Unique catches: credit-card plain-text storage, predictable-password-from-email, SQL query with credentials logged, hardcoded seeded user credentials, log injection via search query.
@@ -341,9 +341,9 @@ Both tools sit at roughly 68–69 % recall. The In-House Agent wins on **evidenc
 3. **Self-triage** — 95 FPs are automatically suppressed, reducing review burden.
 4. **Broader engine coverage** — Wiz SCA (dependency CVEs), Semgrep (IaC / secrets / nginx smuggling / Docker misconfig) and an LLM scanner (logic flaws) all in one output.
 
-Claude Security wins on **logic-chain reasoning** (OAuth trust-level bypasses, audience-separation defeats) that no amount of multi-engine ensembling has yet replicated in the In-House pipeline.
+Claude Security wins on **logic-chain reasoning** (OAuth trust-level bypasses, audience-separation defeats) that no amount of multi-engine ensembling has yet replicated in the In-House pipeline. Note: Claude Security scanned with Effort = **Standard** not **Extended**. Extended scan is likely to procduce more findings but at a significant cost.  
 
-**Team recommendation:** the two are not competitors — they are **complementary**. Layer them.
+**Recommendation:** the two are not competitors — they are **complementary**. Layer them.
 
 ---
 
@@ -355,10 +355,10 @@ Claude Security wins on **logic-chain reasoning** (OAuth trust-level bypasses, a
 4. **The In-House Agent's multi-source + validator architecture is the only design that produces `confirmed_exploitable` evidence for static findings.** That is the difference between "possible XSS" and "`POST` payload `<script>…</script>` returned 201 and rendered on the admin page" — a huge difference for triage speed.
 5. **OAuth and trust-level bypass chains are systematically missed by pattern-based and single-file LLM tools.** Only Claude Security's whole-repo semantic reasoning catches them consistently. This is a real gap worth highlighting to the team.
 6. **Cost dimension:**
-   - Wiz Code: cheapest of all, depending on contract (~€40 per active developer/month).
-   - Claude Security: depending on the enterprise contract, ≈€50–€100 per developer/month (forecast).
-   - AWS Security Agent: 52 task-hours × €50 per task-hour ≈ €2 600 per run.
-   - In-House Agent: **42.5 M tokens across 4 085 LLM calls** ≈ €200–€400 per run depending on model (plus infrastructure cost).
+  - Wiz Code: cheapest of all, depending on contract (~€40 per active developer/month).
+  - Claude Security: depending on the enterprise contract, ≈€50–€100 per developer/month (forecast).
+  - AWS Security Agent: 52 task-hours × €50 per task-hour ≈ €2 600 per run.
+  - In-House Agent: **42.5 M tokens across 4 085 LLM calls** ≈ €200–€400 per run depending on model (plus infrastructure cost).
 
 ---
 
@@ -376,7 +376,7 @@ Commit
   │
 Deploy to staging
   │
-  ├─► AWS Security Agent (DAST)                    [runtime proof-of-exploit + file-upload]
+  ├─► AWS Security Agent (DAST)                    [Pramary DAST]
   │   OR
   └─► In-House Agent (deep analysis + whitebox DAST)
                                                    [multi-agent architecture tailored to organisational needs]
@@ -386,70 +386,70 @@ Deploy to staging
 
 ## Appendix A — 62-Item Ground-Truth Corpus
 
-(Full enumeration used as denominator for recall calculations.)
+(Full enumeration used as denominator for recall calculations. Each item is tagged with its primary vulnerability class.)
 
-1. SQLi in `AuthController.Login` (FromSqlRaw)
-2. SQLi in product search (`ProductController` / `RestCompatController`)
-3. Mass-assignment `role=admin` on registration
-4. Password change without current-password verification (IDOR)
-5. MD5 password hashing
-6. Hardcoded / default JWT secret in `docker-compose.yml`
-7. Plaintext JWT secret in ECS task definition
-8. XXE in `FileService.ParseXmlAsync`
-9. SSRF via XXE
-10. SSRF via profile-image URL fetch
-11. Zip Slip on archive extraction
-12. Path traversal in FTP file-download
-13. Arbitrary write via complaint upload filename
-14. Arbitrary file upload — profile image (no type check)
-15. Arbitrary file upload — complaints
-16. Null-byte extension bypass on FTP blocklist
-17. OAuth postMessage listener missing `event.origin`
-18. OAuth callback `redirectUrl` unescaped XSS
-19. OAuth callback wildcard `postMessage('*')`
-20. OAuth email-link account takeover (no `email_verified` check)
-21. OAuth state not session-bound (CSRF)
-22. OAuth admin endpoints accept shop-audience JWT
-23. Leaderboard admin endpoints accept shop-audience JWT
-24. Leaderboard mass assignment of `points`
-25. Change-password via GET `/rest/user/change-password` IDOR
-26. `SecureAuthController.ChangePassword` `MustChangePassword=true` bypass
-27. Unauthenticated `/api/SecurityAnswers` plant + `/api/Users/reset-password`
-28. `ResetAll` deletable with shop-audience JWT
-29. Unauthenticated MFA-validate enumeration + TOTP brute force
-30. MFA setup accepts shop-audience JWT (attacker enrollment)
-31. Hardcoded admin TOTP secret
-32. TOTP replay (no consumed-code cache)
-33. `QuantitysController` unauthenticated mutation
-34. Basket IDOR — read
-35. Basket IDOR — anonymous
-36. Basket IDOR — write
-37. Basket-item delete missing ownership check
-38. Unauthenticated checkout `POST /rest/basket/{id}/checkout`
-39. UserController GetAll / Delete role-only gate
-40. IDOR `GET /api/Users/{id}`
-41. Stored XSS via registration email on admin page
-42. Stored XSS via feedback comment
-43. Reflected XSS `True-Client-IP`
-44. Reflected XSS `/api/track-order`
-45. DOM XSS search query
-46. Stored XSS `X-Forwarded-For` → `LastLoginIp`
-47. `bypassSecurityTrustHtml` multi-file misuse
-48. Deluxe upgrade w/o payment
-49. Open redirect (substring allowlist)
-50. NoSQL mass-update on reviews PATCH
-51. NoSQL-style code injection on `GET /api/Products/{id}/reviews`
-52. YAML bomb (YamlDotNet defaults)
-53. Verbose error middleware leak
-54. Unauth Prometheus / metrics / logs / directory listing
-55. Permissive AllowAll CORS in production
-56. CSP `unsafe-inline` / `unsafe-eval`
-57. Swagger / OpenAPI exposed unauthenticated
-58. Coupon Base64URL "Base85" forgery
-59. Negative order quantity
-60. Weak RNG `new Random(42)`
-61. `jwt.pub` served as static file
-62. Dependency CVEs
+1. SQLi in `AuthController.Login` (FromSqlRaw) ─► Injection (SQLi)
+2. SQLi in product search (`ProductController` / `RestCompatController`) ─► Injection (SQLi)
+3. Mass-assignment `role=admin` on registration ─► Broken Access Control / Mass Assignment
+4. Password change without current-password verification (IDOR) ─► Broken Access Control / Authentication
+5. MD5 password hashing ─► Cryptographic Failure
+6. Hardcoded / default JWT secret in `docker-compose.yml` ─► Secrets Management / Cryptographic Failure
+7. Plaintext JWT secret in ECS task definition ─► Secrets Management / Security Misconfiguration
+8. XXE in `FileService.ParseXmlAsync` ─► Injection (XXE)
+9. SSRF via XXE ─► SSRF
+10. SSRF via profile-image URL fetch ─► SSRF
+11. Zip Slip on archive extraction ─► Path Traversal
+12. Path traversal in FTP file-download ─► Path Traversal
+13. Arbitrary write via complaint upload filename ─► Path Traversal / Insecure File Handling
+14. Arbitrary file upload — profile image (no type check) ─► Insecure File Upload
+15. Arbitrary file upload — complaints ─► Insecure File Upload
+16. Null-byte extension bypass on FTP blocklist ─► Insecure File Upload / Input Validation
+17. OAuth postMessage listener missing `event.origin` ─► Cross-Origin / Client-Side Security
+18. OAuth callback `redirectUrl` unescaped XSS ─► XSS (Reflected)
+19. OAuth callback wildcard `postMessage('*')` ─► Cross-Origin / Client-Side Security
+20. OAuth email-link account takeover (no `email_verified` check) ─► Authentication / Account Takeover
+21. OAuth state not session-bound (CSRF) ─► CSRF / OAuth Flow
+22. OAuth admin endpoints accept shop-audience JWT ─► Broken Access Control / Token Audience Confusion
+23. Leaderboard admin endpoints accept shop-audience JWT ─► Broken Access Control / Token Audience Confusion
+24. Leaderboard mass assignment of `points` ─► Business Logic Flaw / Mass Assignment
+25. Change-password via GET `/rest/user/change-password` IDOR ─► Broken Access Control (IDOR)
+26. `SecureAuthController.ChangePassword` `MustChangePassword=true` bypass ─► Authentication / Business Logic Flaw
+27. Unauthenticated `/api/SecurityAnswers` plant + `/api/Users/reset-password` ─► Broken Authentication / Account Takeover
+28. `ResetAll` deletable with shop-audience JWT ─► Broken Access Control / Token Audience Confusion
+29. Unauthenticated MFA-validate enumeration + TOTP brute force ─► Broken Authentication / Rate-Limiting
+30. MFA setup accepts shop-audience JWT (attacker enrollment) ─► Broken Access Control / Token Audience Confusion
+31. Hardcoded admin TOTP secret ─► Secrets Management / Cryptographic Failure
+32. TOTP replay (no consumed-code cache) ─► Broken Authentication
+33. `QuantitysController` unauthenticated mutation ─► Broken Access Control / Missing Authentication
+34. Basket IDOR — read ─► Broken Access Control (IDOR)
+35. Basket IDOR — anonymous ─► Broken Access Control (IDOR)
+36. Basket IDOR — write ─► Broken Access Control (IDOR)
+37. Basket-item delete missing ownership check ─► Broken Access Control (IDOR)
+38. Unauthenticated checkout `POST /rest/basket/{id}/checkout` ─► Broken Access Control / Business Logic Flaw
+39. UserController GetAll / Delete role-only gate ─► Broken Access Control
+40. IDOR `GET /api/Users/{id}` ─► Broken Access Control (IDOR)
+41. Stored XSS via registration email on admin page ─► XSS (Stored)
+42. Stored XSS via feedback comment ─► XSS (Stored)
+43. Reflected XSS `True-Client-IP` ─► XSS (Reflected)
+44. Reflected XSS `/api/track-order` ─► XSS (Reflected)
+45. DOM XSS search query ─► XSS (DOM)
+46. Stored XSS `X-Forwarded-For` → `LastLoginIp` ─► XSS (Stored)
+47. `bypassSecurityTrustHtml` multi-file misuse ─► XSS / Insecure Framework Use
+48. Deluxe upgrade w/o payment ─► Business Logic Flaw
+49. Open redirect (substring allowlist) ─► Open Redirect / Input Validation
+50. NoSQL mass-update on reviews PATCH ─► Broken Access Control / Mass Assignment
+51. NoSQL-style code injection on `GET /api/Products/{id}/reviews` ─► Injection (NoSQL)
+52. YAML bomb (YamlDotNet defaults) ─► Denial of Service / Insecure Deserialisation
+53. Verbose error middleware leak ─► Information Disclosure
+54. Unauth Prometheus / metrics / logs / directory listing ─► Information Disclosure / Security Misconfiguration
+55. Permissive AllowAll CORS in production ─► Security Misconfiguration
+56. CSP `unsafe-inline` / `unsafe-eval` ─► Security Misconfiguration
+57. Swagger / OpenAPI exposed unauthenticated ─► Information Disclosure / Security Misconfiguration
+58. Coupon Base64URL "Base85" forgery ─► Business Logic Flaw / Cryptographic Failure
+59. Negative order quantity ─► Business Logic Flaw
+60. Weak RNG `new Random(42)` ─► Cryptographic Failure / Insecure Randomness
+61. `jwt.pub` served as static file ─► Information Disclosure / Cryptographic Failure
+62. Dependency CVEs ─► Vulnerable and Outdated Components (SCA)
 
 ---
 
@@ -470,4 +470,4 @@ Deploy to staging
 
 ---
 
-*Document prepared for internal research discussion. All four tools scanned the same target repository within a 48-hour window.*
+*Document prepared for research purposes. All four tools scanned the same target repository within a 48-hour window.*
