@@ -1,7 +1,7 @@
 # Comparative Analysis: Four Security Tools on `security-training-platform`
 
 **Target codebase:** `github.com/Taofeeqib/security-training-platform` (intentionally vulnerable .NET 8 / Angular Juice-Shop–style training platform)  
-**Target URL:** < Security Training Platform URL>
+**Target URL:** Security Training Platform URL
 **Prepared:** 2026-05-01  
 **Purpose:** Benchmark detection accuracy, false-positive rate, true-positive rate, and false-negative rate across four security tools for research purposes.
 
