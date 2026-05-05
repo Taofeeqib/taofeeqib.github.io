@@ -27,7 +27,7 @@
 - **Cost dimension:**
   - Wiz Code: cheapest of all, depending on contract (~€40 per active developer/month)
   - Claude Security: depending on the enterprise contract, ≈€10 – €50 per scan (forecast)
-  - AWS Security Agent: 52 task-hours × (€50 per task-hour)[https://aws.amazon.com/security-agent/pricing/] ≈ €2 600 per run
+  - AWS Security Agent: 52 task-hours × [€50 per task-hour](https://aws.amazon.com/security-agent/pricing/) ≈ €2 600 per run
   - In-House Agent: **42.5 M tokens across 4 085 LLM calls** ≈ €150–€400 per scan depending on model and the size of the application
 
 ---
