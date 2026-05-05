@@ -11,7 +11,7 @@
 
 - **Benchmark:** four security tools (Wiz Code, AWS Security Agent, Claude Security, In-House Agent) run against the same intentionally-vulnerable target within a 48-hour window, measured against a **62-item consolidated ground-truth corpus**.
 - **No single tool crosses 69 % recall.** A layered pipeline is recommended.
-- **Winner by coverage: In-House Agent (`run_05638cadf43f`)** — 69 % recall, and the only tool that produces **runtime-proven** evidence (72 findings marked `confirmed_exploitable` via live HTTP probes against the deployed target).
+- **Winner by coverage: In-House Agent (`run_05638cadf43f`)** — 69% recall, 58% precision, and the only tool that produces **runtime-proven** evidence (72 findings marked `confirmed_exploitable` via live HTTP probes against the deployed target).
 - **Winner by precision: Claude Security** — 68 % recall, 89 % precision, and the only tool that consistently catches the OAuth / trust-level bypass chains (5 findings) that single-file LLM and pattern-matching engines miss.
 - **Wiz Code is the weakest standalone engine here (16 % recall)** but uniquely valuable for **SCA + IaC** (dependency CVEs, Dockerfile, workflow pinning) — keep it in the pipeline as the SCA/IaC layer, not as primary SAST.
 - **AWS Security Agent** is the best **DAST** layer — 33 findings shipped with proof-of-exploit payloads, strongest on file-upload and business-logic reachability.
@@ -20,11 +20,15 @@
   - SAST: `Dependabot (SCA) + Claude Security (AI SAST)` → for a limited budget
   - DAST: `AWS Security Agent (on-demand DAST on staging)` → if budget allows
   - DAST: `In-House Agent (fusion + DAST validator + self-triage)` → for a limited budget
+  - Deployment Strategy:
+    - Prioritize critical services and high-risk applications
+    - Adopt on-demand and periodic scanning (monthly or quarterly)
+    - Trigger scans based on meaningful changes
 - **Cost dimension:**
   - Wiz Code: cheapest of all, depending on contract (~€40 per active developer/month)
-  - Claude Security: depending on the enterprise contract, ≈€50–€100 per developer/month (forecast)
-  - AWS Security Agent: 52 task-hours × €50 per task-hour ≈ €2 600 per run
-  - In-House Agent: **42.5 M tokens across 4 085 LLM calls** ≈ €200–€400 per run depending on model (plus infrastructure cost)
+  - Claude Security: depending on the enterprise contract, ≈€10 – €50 per scan (forecast)
+  - AWS Security Agent: 52 task-hours × (€50 per task-hour)[https://aws.amazon.com/security-agent/pricing/] ≈ €2 600 per run
+  - In-House Agent: **42.5 M tokens across 4 085 LLM calls** ≈ €150–€400 per scan depending on model and the size of the application
 
 ---
 
@@ -53,7 +57,7 @@
 
 ## 1. Introduction
 
-This report compares four independent security tools against a single intentionally-vulnerable target — `security-training-platform`, a .NET 8 / Angular application modelled on OWASP Juice Shop — so that the team can make an evidence-based decision about which tools to adopt, in which combinations, and at what cost.
+This report compares four independent security tools against a single intentionally vulnerable target: `security-training-platform`, a .NET 8 / Angular application modeled on OWASP Juice Shop (highly modified to introduce new security flaws, especially business logic flaws). The goal is to enable evidence-based decisions on which tools to adopt, how to combine them effectively, and at what cost.
 
 The four tools were selected to cover the main categories used in modern application-security pipelines:
 
