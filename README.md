@@ -359,10 +359,10 @@ Claude Security wins on **logic-chain reasoning** (OAuth trust-level bypasses, a
 4. **The In-House Agent's multi-source + validator architecture is the only design that produces `confirmed_exploitable` evidence for static findings.** That is the difference between "possible XSS" and "`POST` payload `<script>…</script>` returned 201 and rendered on the admin page" — a huge difference for triage speed.
 5. **OAuth and trust-level bypass chains are systematically missed by pattern-based and single-file LLM tools.** Only Claude Security's whole-repo semantic reasoning catches them consistently. This is a real gap worth highlighting to the team.
 6. **Cost dimension:**
-  - Wiz Code: cheapest of all, depending on contract (~€40 per active developer/month).
-  - Claude Security: depending on the enterprise contract, ≈€50–€100 per developer/month (forecast).
-  - AWS Security Agent: 52 task-hours × €50 per task-hour ≈ €2 600 per run.
-  - In-House Agent: **42.5 M tokens across 4 085 LLM calls** ≈ €200–€400 per run depending on model (plus infrastructure cost).
+  - Wiz Code: cheapest of all, depending on contract (~€40 per active developer/month)
+  - Claude Security: depending on the enterprise contract, ≈€10 – €50 per scan (forecast)
+  - AWS Security Agent: 52 task-hours × [€50 per task-hour](https://aws.amazon.com/security-agent/pricing/) ≈ €2 600 per run
+  - In-House Agent: **42.5 M tokens across 4 085 LLM calls** ≈ €150–€400 per scan depending on model and the size of the application.
 
 ---
 
