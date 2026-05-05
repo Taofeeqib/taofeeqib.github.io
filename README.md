@@ -11,9 +11,9 @@
 
 - **Benchmark:** four security tools (Wiz Code, AWS Security Agent, Claude Security, In-House Agent) run against the same intentionally-vulnerable target within a 48-hour window, measured against a **62-item consolidated ground-truth corpus**.
 - **No single tool crosses 69 % recall.** A layered pipeline is recommended.
-- **Winner by coverage: In-House Agent (`run_05638cadf43f`)** — 69% recall, 58% precision, and the only tool that produces **runtime-proven** evidence (72 findings marked `confirmed_exploitable` via live HTTP probes against the deployed target).
+- **Winner by coverage: In-House Agent (`run_05638cadf43f`)** — 69% recall, 58% precision, and the one of two tools that produces runtime-proven evidence (72 findings marked confirmed_exploitable via live HTTP probes against the deployed target).
 - **Winner by precision: Claude Security** — 68 % recall, 89 % precision, and the only tool that consistently catches the OAuth / trust-level bypass chains (5 findings) that single-file LLM and pattern-matching engines miss.
-- **Wiz Code is the weakest standalone engine here (16 % recall)** but uniquely valuable for **SCA + IaC** (dependency CVEs, Dockerfile, workflow pinning) — keep it in the pipeline as the SCA/IaC layer, not as primary SAST.
+- **Wiz Code is the weakest standalone engine here (16 % recall)** but uniquely valuable for **SCA + IaC + Speed**  (dependency CVEs, Dockerfile, workflow pinning) — keep it in the pipeline as the SCA/IaC layer, not as primary SAST.
 - **AWS Security Agent** is the best **DAST** layer — 33 findings shipped with proof-of-exploit payloads, strongest on file-upload and business-logic reachability.
 - **Recommended stack** (see [§11](#11-recommended-pipeline)):
   - SAST: `Wiz Code (SCA/IaC) + Claude Security (AI SAST)` → if budget allows
